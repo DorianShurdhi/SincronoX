@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
@@ -78,67 +79,121 @@ public class NuovaServlet extends HttpServlet {
 	} 
 	
 	private void toSaldo(HttpServletRequest request, HttpServletResponse response, String id_ut) throws ServletException, IOException {
+		Utente ut = new Utente();
+		UtenteDAO x = new UtenteDAO();
+		int id = Integer.parseInt(id_ut);
+		String user="";
+		double saldo=0.0;
+		String password=""; 
+		try {
+		 	user = x.getUser(id);
+		 	saldo = x.getSaldo(id);
+			password = x.getPass(id);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ut.setUser(user);
+		ut.setId(id);
+		ut.setSaldo(saldo);
+		ut.setPassword(password);
+		
 		RequestDispatcher disp=request.getRequestDispatcher("/view/ricarica.jsp");
-		request.setAttribute("id", id_ut);
+		request.setAttribute("utente", ut);
 		disp.forward(request,response);
 	}
 	private void fromSaldo(HttpServletRequest request, HttpServletResponse response, String addSaldo, String id_ut) throws ServletException, IOException {
-		Utente x = new Utente();
-		int id = Integer.parseInt(id_ut);
-		double saldo = ut.getSaldo(id);
-		x.setId(id);
-		x.setUser(user);
-		x.setPassword(pass);
-		x.setSaldo(saldo);
-		RequestDispatcher disp=request.getRequestDispatcher("/view/scheda_utente.jsp");
-		request.setAttribute("utente", x);
-		disp.forward(request,response);
+		try {
+			int id = Integer.parseInt(id_ut);
+			double saldo = Double.parseDouble(addSaldo);
+
+			UtenteDAO x = new UtenteDAO();
+			Utente ut = new Utente();
+
+			x.setSaldo(saldo, id);
+			
+			ut.setId(id);
+			ut.setUser(x.getUser(id));
+			ut.setPassword(x.getPass(id));
+			ut.setSaldo(x.getSaldo(id));
+				
+			RequestDispatcher req = request.getRequestDispatcher("/view/scheda_utente.jsp");
+			request.setAttribute("utente", ut);
+			req.forward(request, response);
+			return ;
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
+
 	
-	private String estrazione() {
+	private void toGiocata(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int i=0;
 		String num_estratti = "";
+		ArrayList<Integer> arrayEstratti = new ArrayList<Integer>();
+
 		ArrayList<Integer> array = new ArrayList<Integer>();
-		for(i=0; i<90; i++) {
-			array.add(i+1);
+		for(i=1; i<91; i++) {
+			array.add(i);
 		}
 		Random random = new Random();
 		int j = 1;
-		int n = 90-j;
-		int primo   = random.nextInt(n)+j;
+		int n = 91-j;
+		int primo   = random.nextInt(n);
 		num_estratti += (array.get(primo)+" - ");
+		arrayEstratti.add(array.get(primo));
 		array.remove(primo);
 		
-		n--;
-		int secondo = random.nextInt(n)+j;
+		n=n-1;
+		int secondo = random.nextInt(n);
 		num_estratti += (array.get(secondo)+" - ");
+		arrayEstratti.add(array.get(secondo));
 		array.remove(secondo);
 
-		n--;
-		int terzo   = random.nextInt(n)+j;
+		n=n-1;
+		int terzo   = random.nextInt(n);
 		num_estratti += (array.get(terzo)+" - ");
+		arrayEstratti.add(array.get(terzo));
 		array.remove(terzo);
 
-		n--;
-		int quarto  = random.nextInt(n)+j;
+		n=n-1;
+		int quarto  = random.nextInt(n);
 		num_estratti += (array.get(quarto)+" - ");
+		arrayEstratti.add(array.get(quarto));
 		array.remove(quarto);
 
-		n--;
-		int quinto  = random.nextInt(n)+j;
-		num_estratti += (quinto+" - ");
+		n=n-1;
+		int quinto  = random.nextInt(n);
+		num_estratti += (array.get(quinto)+" - ");
+		arrayEstratti.add(array.get(quinto));
 		array.remove(quinto);
 
-		n--;
-		int sesto   = random.nextInt(n)+j;
-		num_estratti += (sesto);
+		n=n-1;
+		int sesto   = random.nextInt(n);
+		num_estratti += (array.get(sesto));
+		arrayEstratti.add(array.get(sesto));
 		array.remove(sesto);
 		
-		return num_estratti;
-	}
-	private void toGiocata(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String num_estratti = estrazione();
+		ArrayList<Integer> arrayGiocati = new ArrayList<Integer>();
+		arrayGiocati.add(Integer.parseInt(request.getParameter("uno")));
+		arrayGiocati.add(Integer.parseInt(request.getParameter("due")));
+		arrayGiocati.add(Integer.parseInt(request.getParameter("tre")));
+		arrayGiocati.add(Integer.parseInt(request.getParameter("qua")));
+		arrayGiocati.add(Integer.parseInt(request.getParameter("cin")));
+		arrayGiocati.add(Integer.parseInt(request.getParameter("sei")));
 		
+		Collections.sort(arrayEstratti);
+		Collections.sort(arrayGiocati);
+		boolean vinto=true;
+		for(int q=0; q<6; q++) {
+			if(arrayEstratti.get(q) != arrayGiocati.get(q)) {
+				vinto=false;
+			}
+		}
+
 		int id = Integer.parseInt(request.getParameter("id_utente"));
 		
 		String num_giocati="";
@@ -156,6 +211,19 @@ public class NuovaServlet extends HttpServlet {
 		} catch (SQLException e) { } 
 		
 		UtenteDAO ut = new UtenteDAO();
+		try {
+			ut.setSaldo(-1.0, id);
+			if(vinto) {
+				ut.setSaldo(50000000, id);
+				request.setAttribute("esito", true);
+			}
+			else {
+				request.setAttribute("esito", false);
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String us="";
 		String pa="";
 		try {
@@ -217,7 +285,7 @@ public class NuovaServlet extends HttpServlet {
 			fromGiocata(request, response, request.getParameter("id"), request.getParameter("user"));
 		}
 		if(hidden.equals("6")) {
-			fromSaldo(request, response, request.getParameter("addsaldo"), request.getParameter("id_utente"));
+			fromSaldo(request, response, request.getParameter("addSaldo"), request.getParameter("id_utente"));
 		}
 	}
 

@@ -1,0 +1,30 @@
+@charset "ISO-8859-1";
+
+body {
+  font-family: Sans-serif;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+td {
+    text-align: center;
+}
+
+tr {
+    background-color: #ff8000;
+    color: white;
+}
+
+input { 
+  background: Cyan;
+  border: 5px solid Blue;
+  text-align : center;
+  color: Gray;
+  width: 150px;
+}
+
+#immagine {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+}

@@ -83,8 +83,9 @@ public class UtenteDAO {
 	public void setSaldo(double addsaldo, int id) throws SQLException {
 		if(conn==null) conn=DAO.getConnection();
 	    Statement st = conn.createStatement();
-	        
-	    st.executeUpdate("update utente set saldo='"+addsaldo+"' where id='"+id+"'");
+	    double old = this.getSaldo(id);
+	    old += addsaldo;
+		st.executeUpdate("UPDATE superenalotto.utente SET saldo = "+old+" where id="+id);
 	}
     
 }

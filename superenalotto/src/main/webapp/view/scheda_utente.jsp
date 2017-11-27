@@ -6,13 +6,46 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/scheda_utente.css">
 <title>Insert title here</title>
 
 <script type="text/javascript">
 	
-	function validaForm(form){
-		alert("sto controllando");
+	function validaForm(form){		
+		if(parseFloat(form.saldo.value)<=0){
+			alert("sei un poraccio");
+			return false;
+		}
+		else if(form.uno.value==""){
+			alert("inserisci tutti i numeri");
+			form.uno.focus();
+			return false;
+		}
+		if(form.due.value==""){
+			alert("inserisci tutti i numeri");
+			form.due.focus();
+			return false;
+		}
+		if(form.tre.value==""){
+			alert("inserisci tutti i numeri");
+			form.tre.focus();
+			return false;
+		}
+		if(form.qua.value==""){
+			alert("inserisci tutti i numeri");
+			form.qua.focus();
+			return false;
+		}
+		if(form.cin.value==""){
+			alert("inserisci tutti i numeri");
+			form.cin.focus();
+			return false;
+		}
+		if(form.sei.value==""){
+			alert("inserisci tutti i numeri");
+			form.sei.focus();
+			return false;
+		}
 		
 		var a = parseInt(form.uno.value, 10);
 		var b = parseInt(form.due.value, 10);
@@ -73,7 +106,7 @@
 	<table width="100%" height="100%" border="1">
 		<center>
 		<tr>
-			<td>info utente<br>
+			<td>id  e  user<br>
 				
 				<% Utente ut = (Utente) request.getAttribute("utente");
 					out.println(ut.getId());
@@ -88,6 +121,7 @@
 				 <input name="qua" type="number">
 				 <input name="cin" type="number">
 				 <input name="sei" type="number"> </td>
+				 <input type="hidden" name="saldo" value="<%out.print(ut.getSaldo());%>">
 			<td> saldo<br>
 			<%
 				out.println(ut.getSaldo());
@@ -100,7 +134,8 @@
 			<td><form action="NuovaServlet" method="post">
 				<input type="submit" value="ricarica">
 				<input type="hidden" name="controllo" value="3">
-				<%  out.println("<input type='hidden' name='id_utente' value='"+ut.getId()+"'>"); %>
+				<input type='hidden' name="id" value="<%Utente u = (Utente) request.getAttribute("utente");
+					out.print(u.getId());%>">
 			</form></td>
 		</tr>
 		<tr>
@@ -110,5 +145,8 @@
 		</tr>
 		</center>
 	</table>
+	
+		<img alt="" src="img/footer.jpg" align="bottom" style="margin-top: 40%; margin-left: 0%" width="100%">
+	
 </body>
 </html>
